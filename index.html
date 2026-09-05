@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rental Application Refund Request Form</title>
+
   <style>
     :root {
       --primary-color: #1e3a8a;
@@ -13,6 +14,7 @@
       --bg-card: #ffffff;
       --bg-page: #f8fafc;
       --accent: #2563eb;
+      --success: #16a34a;
     }
 
     * {
@@ -34,7 +36,9 @@
       margin: 0 auto;
       background: var(--bg-card);
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.07),
+        0 2px 4px -2px rgba(0, 0, 0, 0.05);
       border: 1px solid #e2e8f0;
       overflow: hidden;
     }
@@ -90,7 +94,9 @@
       .grid-2 {
         grid-template-columns: 1fr;
       }
-      .header, form {
+
+      .header,
+      form {
         padding: 24px 20px;
       }
     }
@@ -125,6 +131,19 @@
       font-size: 14px;
       color: var(--text-main);
       background-color: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
     textarea {
@@ -148,6 +167,12 @@
       color: #334155;
       cursor: pointer;
       font-weight: normal;
+    }
+
+    .checkbox-label input,
+    .radio-label input {
+      margin-top: 4px;
+      flex-shrink: 0;
     }
 
     .notice-box {
@@ -174,6 +199,7 @@
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
+      transition: 0.2s ease;
     }
 
     .btn-secondary {
@@ -182,188 +208,604 @@
       border: 1px solid #cbd5e1;
     }
 
+    .btn-secondary:hover {
+      background-color: #f8fafc;
+    }
+
     .btn-primary {
       background-color: var(--primary-color);
       color: #fff;
       border: 1px solid var(--primary-color);
     }
+
+    .btn-primary:hover {
+      background-color: #172f73;
+    }
+
+    /* =========================
+       SUCCESS POPUP
+       ========================= */
+
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    .popup {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 32px;
+      text-align: center;
+      box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.15),
+        0 10px 10px -5px rgba(0, 0, 0, 0.08);
+      animation: popupShow 0.25s ease-out;
+    }
+
+    @keyframes popupShow {
+      from {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .popup h2 {
+      color: #1e293b;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .popup p {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .popup-button {
+      width: 100%;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .popup-button:hover {
+      background-color: #172f73;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 10px;
+      }
+
+      .popup {
+        padding: 26px 20px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
+
 <body>
 
   <div class="form-container">
+
     <div class="header">
       <h1>Rental Application &amp; Fee Refund Request</h1>
-      <p>Submit your request to review eligibility for an application fee, holding deposit, or transaction refund.</p>
+      <p>
+        Submit your request to review eligibility for an application fee,
+        holding deposit, or transaction refund.
+      </p>
     </div>
 
-    <form action="#" method="POST" enctype="multipart/form-data">
-      
+    <form id="refundForm" action="#" method="POST" enctype="multipart/form-data">
+
       <!-- Section 1 -->
       <div class="section">
         <div class="section-title">1. Applicant Information</div>
+
         <div class="grid-2">
+
           <div class="form-group full-width">
             <label for="fullName">Full Legal Name *</label>
-            <input type="text" id="fullName" name="fullName" required placeholder="Jane Doe">
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              required
+              placeholder="Jane Doe"
+            >
           </div>
+
           <div class="form-group">
             <label for="phone">Primary Phone Number *</label>
-            <input type="tel" id="phone" name="phone" required placeholder="(555) 000-0000">
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              required
+              placeholder="(555) 000-0000"
+            >
           </div>
+
           <div class="form-group">
             <label for="email">Email Address *</label>
-            <input type="email" id="email" name="email" required placeholder="jane@example.com">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="jane@example.com"
+            >
           </div>
+
           <div class="form-group full-width">
-            <label for="accountId">Online User / Reference ID (Optional)</label>
-            <input type="text" id="accountId" name="accountId" placeholder="e.g. APP-84920">
+            <label for="accountId">
+              Online User / Reference ID (Optional)
+            </label>
+            <input
+              type="text"
+              id="accountId"
+              name="accountId"
+              placeholder="e.g. APP-84920"
+            >
           </div>
+
         </div>
       </div>
 
       <!-- Section 2 -->
       <div class="section">
-        <div class="section-title">2. Transaction &amp; Payment Information</div>
-        
+        <div class="section-title">
+          2. Transaction &amp; Payment Information
+        </div>
+
         <div class="form-group">
           <label>Type of Payment Made *</label>
+
           <div class="options-group">
+
             <label class="radio-label">
-              <input type="radio" name="paymentType" value="screening_fee" required>
+              <input
+                type="radio"
+                name="paymentType"
+                value="screening_fee"
+                required
+              >
               Rental Application Fee (Screening / Processing)
             </label>
+
             <label class="radio-label">
-              <input type="radio" name="paymentType" value="holding_deposit">
+              <input
+                type="radio"
+                name="paymentType"
+                value="holding_deposit"
+              >
               Holding Deposit / Security Deposit
             </label>
+
             <label class="radio-label">
-              <input type="radio" name="paymentType" value="service_fee">
+              <input
+                type="radio"
+                name="paymentType"
+                value="service_fee"
+              >
               Platform Service / Listing Access Fee
             </label>
+
           </div>
         </div>
 
         <div class="grid-2">
+
           <div class="form-group">
-            <label for="transactionId">Transaction / Receipt ID *</label>
-            <input type="text" id="transactionId" name="transactionId" required placeholder="e.g. TXN-1928374">
+            <label for="transactionId">
+              Transaction / Receipt ID *
+            </label>
+            <input
+              type="text"
+              id="transactionId"
+              name="transactionId"
+              required
+              placeholder="e.g. TXN-1928374"
+            >
           </div>
+
           <div class="form-group">
             <label for="amountPaid">Amount Paid ($) *</label>
-            <input type="number" id="amountPaid" name="amountPaid" step="0.01" required placeholder="50.00">
+            <input
+              type="number"
+              id="amountPaid"
+              name="amountPaid"
+              step="0.01"
+              min="0"
+              required
+              placeholder="50.00"
+            >
           </div>
+
           <div class="form-group">
             <label for="paymentMethod">Payment Method *</label>
-            <select id="paymentMethod" name="paymentMethod" required>
-              <option value="" disabled selected>Select payment method</option>
-              <option value="credit_debit">Credit / Debit Card</option>
-              <option value="bank_transfer">Bank Transfer (ACH)</option>
-              <option value="digital_wallet">Digital Wallet / Online Gateway</option>
+
+            <select
+              id="paymentMethod"
+              name="paymentMethod"
+              required
+            >
+              <option value="" disabled selected>
+                Select payment method
+              </option>
+              <option value="credit_debit">
+                Credit / Debit Card
+              </option>
+              <option value="bank_transfer">
+                Bank Transfer (ACH)
+              </option>
+              <option value="digital_wallet">
+                Digital Wallet / Online Gateway
+              </option>
             </select>
           </div>
+
           <div class="form-group">
             <label for="paymentDate">Payment Date *</label>
-            <input type="date" id="paymentDate" name="paymentDate" required>
+            <input
+              type="date"
+              id="paymentDate"
+              name="paymentDate"
+              required
+            >
           </div>
+
         </div>
       </div>
 
       <!-- Section 3 -->
       <div class="section">
-        <div class="section-title">3. Reason for Refund Request</div>
+        <div class="section-title">
+          3. Reason for Refund Request
+        </div>
+
         <div class="form-group">
           <label>Primary Reason *</label>
+
           <div class="options-group">
+
             <label class="radio-label">
-              <input type="radio" name="refundReason" value="property_unavailable" required>
+              <input
+                type="radio"
+                name="refundReason"
+                value="property_unavailable"
+                required
+              >
               Property Unavailable (Leased or withdrawn before processing)
             </label>
+
             <label class="radio-label">
-              <input type="radio" name="refundReason" value="duplicate_charge">
+              <input
+                type="radio"
+                name="refundReason"
+                value="duplicate_charge"
+              >
               Duplicate Charge (Billed multiple times for same application)
             </label>
+
             <label class="radio-label">
-              <input type="radio" name="refundReason" value="technical_glitch">
+              <input
+                type="radio"
+                name="refundReason"
+                value="technical_glitch"
+              >
               System Error / Technical Glitch during checkout
             </label>
+
             <label class="radio-label">
-              <input type="radio" name="refundReason" value="cancelled_window">
+              <input
+                type="radio"
+                name="refundReason"
+                value="cancelled_window"
+              >
               Canceled within allowable cancellation window
             </label>
+
             <label class="radio-label">
-              <input type="radio" name="refundReason" value="other">
+              <input
+                type="radio"
+                name="refundReason"
+                value="other"
+              >
               Other / Special Circumstances
             </label>
+
           </div>
         </div>
 
         <div class="form-group">
-          <label for="explanation">Detailed Explanation *</label>
-          <textarea id="explanation" name="explanation" required placeholder="Please provide specific details regarding your request..."></textarea>
+          <label for="explanation">
+            Detailed Explanation *
+          </label>
+
+          <textarea
+            id="explanation"
+            name="explanation"
+            required
+            placeholder="Please provide specific details regarding your request..."
+          ></textarea>
         </div>
       </div>
 
       <!-- Section 4 -->
       <div class="section">
-        <div class="section-title">4. Supporting Documentation</div>
+        <div class="section-title">
+          4. Supporting Documentation
+        </div>
+
         <div class="form-group">
           <label>Select Included Documents:</label>
+
           <div class="options-group">
+
             <label class="checkbox-label">
-              <input type="checkbox" name="docs[]" value="receipt">
+              <input
+                type="checkbox"
+                name="docs[]"
+                value="receipt"
+              >
               Proof of Payment / Bank or Transaction Receipt
             </label>
+
             <label class="checkbox-label">
-              <input type="checkbox" name="docs[]" value="confirmation">
+              <input
+                type="checkbox"
+                name="docs[]"
+                value="confirmation"
+              >
               Copy of Application Submission Confirmation
             </label>
+
             <label class="checkbox-label">
-              <input type="checkbox" name="docs[]" value="communication">
+              <input
+                type="checkbox"
+                name="docs[]"
+                value="communication"
+              >
               Written Communication with Landlord / Property Manager
             </label>
+
           </div>
         </div>
 
         <div class="form-group">
-          <label for="fileAttachment">Upload File(s)</label>
-          <input type="file" id="fileAttachment" name="fileAttachment" multiple accept=".pdf,.png,.jpg,.jpeg">
+          <label for="fileAttachment">
+            Upload File(s)
+          </label>
+
+          <input
+            type="file"
+            id="fileAttachment"
+            name="fileAttachment"
+            multiple
+            accept=".pdf,.png,.jpg,.jpeg"
+          >
         </div>
       </div>
 
       <!-- Section 5 -->
       <div class="section">
-        <div class="section-title">5. Terms &amp; Acknowledgment</div>
+        <div class="section-title">
+          5. Terms &amp; Acknowledgment
+        </div>
+
         <div class="notice-box">
-          <strong>Notice on Processing &amp; Policy:</strong> Standard application screening and background check fees are typically non-refundable once verification has commenced. Approved refunds are returned directly to the original method of payment within 5 to 10 business days.
+          <strong>Notice on Processing &amp; Policy:</strong>
+          Standard application screening and background check fees are
+          typically non-refundable once verification has commenced.
+          Approved refunds are returned directly to the original method
+          of payment within 5 to 10 business days.
         </div>
 
         <div class="grid-2">
+
           <div class="form-group">
-            <label for="signature">Applicant Full Name (Digital Signature) *</label>
-            <input type="text" id="signature" name="signature" required placeholder="Jane Doe">
+            <label for="signature">
+              Applicant Full Name (Digital Signature) *
+            </label>
+
+            <input
+              type="text"
+              id="signature"
+              name="signature"
+              required
+              placeholder="Jane Doe"
+            >
           </div>
+
           <div class="form-group">
             <label for="sigDate">Date *</label>
-            <input type="date" id="sigDate" name="sigDate" required>
+
+            <input
+              type="date"
+              id="sigDate"
+              name="sigDate"
+              required
+            >
           </div>
+
         </div>
 
         <div class="form-group">
+
           <label class="checkbox-label">
-            <input type="checkbox" required>
+            <input
+              type="checkbox"
+              id="certification"
+              name="certification"
+              required
+            >
+
             I certify that the information provided above is true and accurate.
           </label>
+
         </div>
       </div>
 
+      <!-- Buttons -->
       <div class="actions">
-        <button type="reset" class="btn-secondary">Clear Form</button>
-        <button type="submit" class="btn-primary">Submit Refund Request</button>
+
+        <button
+          type="reset"
+          class="btn-secondary"
+        >
+          Clear Form
+        </button>
+
+        <button
+          type="submit"
+          class="btn-primary"
+        >
+          Submit Refund Request
+        </button>
+
       </div>
 
     </form>
   </div>
+
+
+  <!-- =========================
+       SUCCESS POPUP
+       ========================= -->
+
+  <div
+    class="popup-overlay"
+    id="successPopup"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="popupTitle"
+  >
+
+    <div class="popup">
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+      <h2 id="popupTitle">
+        Request Submitted Successfully
+      </h2>
+
+      <p>
+        Your refund request has been submitted successfully.
+        We will review the information provided and process your
+        request according to the applicable refund policy.
+      </p>
+
+      <button
+        type="button"
+        class="popup-button"
+        id="closePopup"
+      >
+        OK
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       JAVASCRIPT
+       ========================= -->
+
+  <script>
+    const form = document.getElementById("refundForm");
+    const successPopup = document.getElementById("successPopup");
+    const closePopup = document.getElementById("closePopup");
+
+    form.addEventListener("submit", function (event) {
+
+      // Stop the browser from refreshing/submitting to the "#" URL
+      event.preventDefault();
+
+      // Show success popup
+      successPopup.classList.add("show");
+
+    });
+
+    closePopup.addEventListener("click", function () {
+
+      // Close popup
+      successPopup.classList.remove("show");
+
+      // Optional: reset the form after successful submission
+      form.reset();
+
+    });
+
+    // Close popup if user clicks outside the popup box
+    successPopup.addEventListener("click", function (event) {
+
+      if (event.target === successPopup) {
+        successPopup.classList.remove("show");
+      }
+
+    });
+
+    // Close popup with Escape key
+    document.addEventListener("keydown", function (event) {
+
+      if (
+        event.key === "Escape" &&
+        successPopup.classList.contains("show")
+      ) {
+        successPopup.classList.remove("show");
+      }
+
+    });
+  </script>
 
 </body>
 </html>
